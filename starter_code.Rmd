@@ -10,6 +10,7 @@ library(fs)
 library(gt)
 library(tidymodels)
 library(tidyverse)
+library(parsnip)
 ```
 
 
@@ -125,6 +126,38 @@ metrics(x_2, truth = dvote, estimate = pred_dvote) %>%
     tab_header("Model 2 Evaluation on All Data")
 
 # Much better! Repo before class.
+
+```
+
+```{r}
+logistic_reg() %>%
+  set_engine("glm") %>%
+  fit(data = clean, dvote ~ gender + party + state + office) %>%
+  predict(new_data = clean) %>%
+  bind_cols(clean) %>%
+  metrics(truth = dvote, estimate = .pred_class) %>% 
+  gt() %>% 
+    tab_header("Model 2 Evaluation on All Data")
+  
+```
+
+```{r}
+
+# Set 1% of data as training data
+
+split <- initial_split(clean, props = 1/100)
+vote_train <- training(split)
+vote_test <- testing(split)
+
+
+logistic_reg() %>%
+  set_engine("glm") %>%
+  fit(data = vote_train, dvote ~ gender + party + state + office) %>%
+  predict(new_data = clean) %>%
+  bind_cols(clean) %>%
+  metrics(truth = dvote, estimate = .pred_class) %>% 
+  gt() %>% 
+    tab_header("Model 2 Evaluation on All Data")
 
 ```
 
